@@ -39,7 +39,7 @@ public class AuthService {
         if (userRepository.findByUsername(dto.username()).isPresent()) {
             throw new IllegalArgumentException("Username already taken: " + dto.username());
         }
-        User user = new User(null, dto.username(), passwordEncoder.encode(dto.password()), "ROLE_USER");
+        User user = new User(null, dto.username(), passwordEncoder.encode(dto.password()), "ROLE_USER", null);
         User saved = userRepository.save(user);
         return new UserResponseDto(saved.getId(), saved.getUsername(), saved.getRole());
     }

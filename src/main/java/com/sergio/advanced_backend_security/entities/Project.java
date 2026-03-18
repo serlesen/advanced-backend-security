@@ -12,5 +12,6 @@ public class Project {
     private String name;
     private String description;
     private String status;
-    private Long userId;
+    private Long ownerId;
+    private Long organizationId;
 }

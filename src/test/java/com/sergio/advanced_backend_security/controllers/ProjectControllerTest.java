@@ -3,6 +3,7 @@ package com.sergio.advanced_backend_security.controllers;
 import tools.jackson.databind.ObjectMapper;
 import com.sergio.advanced_backend_security.dtos.ProjectRequestDto;
 import com.sergio.advanced_backend_security.dtos.ProjectResponseDto;
+import com.sergio.advanced_backend_security.security.CustomPermissionEvaluator;
 import com.sergio.advanced_backend_security.security.JwtUtil;
 import com.sergio.advanced_backend_security.security.UserDetailsServiceImpl;
 import com.sergio.advanced_backend_security.services.ProjectService;
@@ -45,6 +46,9 @@ class ProjectControllerTest {
     @MockitoBean
     private UserDetailsServiceImpl userDetailsService;
 
+    @MockitoBean
+    private CustomPermissionEvaluator customPermissionEvaluator;
+
     @Test
     @WithMockUser
     void findAll_authenticated_returns200WithList() throws Exception {
@@ -85,7 +89,7 @@ class ProjectControllerTest {
 
         mockMvc.perform(post("/projects")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ProjectRequestDto("Website Redesign", "Redesign the company website with modern UI", "active", 1L))))
+                        .content(objectMapper.writeValueAsString(new ProjectRequestDto("Website Redesign", "Redesign the company website with modern UI", "active", 1L, null))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Website Redesign"));
@@ -98,7 +102,7 @@ class ProjectControllerTest {
 
         mockMvc.perform(put("/projects/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ProjectRequestDto("Website Redesign v2", "Updated project scope and deliverables", "active", 1L))))
+                        .content(objectMapper.writeValueAsString(new ProjectRequestDto("Website Redesign v2", "Updated project scope and deliverables", "active", 1L, null))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Website Redesign v2"))
                 .andExpect(jsonPath("$.status").value("active"));

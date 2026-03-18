@@ -30,8 +30,8 @@ class ProjectServiceTest {
     @Test
     void findAll_returnsAllProjectsAsDtos() {
         when(projectRepository.findAll()).thenReturn(List.of(
-                new Project(1L, "Website Redesign", "Redesign the company website with modern UI", "active", 1L),
-                new Project(2L, "Mobile App MVP", "First version of the iOS and Android mobile application", "draft", 1L)
+                new Project(1L, "Website Redesign", "Redesign the company website with modern UI", "active", 1L, null),
+                new Project(2L, "Mobile App MVP", "First version of the iOS and Android mobile application", "draft", 1L, null)
         ));
 
         List<ProjectResponseDto> result = projectService.findAll();
@@ -43,7 +43,7 @@ class ProjectServiceTest {
 
     @Test
     void findById_whenExists_returnsDto() {
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(new Project(1L, "Website Redesign", "Redesign the company website with modern UI", "active", 1L)));
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(new Project(1L, "Website Redesign", "Redesign the company website with modern UI", "active", 1L, null)));
 
         ProjectResponseDto result = projectService.findById(1L);
 
@@ -51,7 +51,7 @@ class ProjectServiceTest {
         assertThat(result.name()).isEqualTo("Website Redesign");
         assertThat(result.description()).isEqualTo("Redesign the company website with modern UI");
         assertThat(result.status()).isEqualTo("active");
-        assertThat(result.userId()).isEqualTo(1L);
+        assertThat(result.ownerId()).isEqualTo(1L);
     }
 
     @Test
@@ -71,22 +71,22 @@ class ProjectServiceTest {
             return project;
         });
 
-        ProjectResponseDto result = projectService.create(new ProjectRequestDto("Website Redesign", "Redesign the company website with modern UI", "active", 1L));
+        ProjectResponseDto result = projectService.create(new ProjectRequestDto("Website Redesign", "Redesign the company website with modern UI", "active", 1L, null));
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.name()).isEqualTo("Website Redesign");
         assertThat(result.status()).isEqualTo("active");
-        assertThat(result.userId()).isEqualTo(1L);
+        assertThat(result.ownerId()).isEqualTo(1L);
         verify(projectRepository).save(any());
     }
 
     @Test
     void update_whenExists_updatesFields() {
-        Project existing = new Project(1L, "Website Redesign", "Initial project description", "draft", 1L);
+        Project existing = new Project(1L, "Website Redesign", "Initial project description", "draft", 1L, null);
         when(projectRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(projectRepository.save(existing)).thenReturn(existing);
 
-        ProjectResponseDto result = projectService.update(1L, new ProjectRequestDto("Website Redesign v2", "Updated project scope and deliverables", "active", 1L));
+        ProjectResponseDto result = projectService.update(1L, new ProjectRequestDto("Website Redesign v2", "Updated project scope and deliverables", "active", 1L, null));
 
         assertThat(result.name()).isEqualTo("Website Redesign v2");
         assertThat(result.description()).isEqualTo("Updated project scope and deliverables");
@@ -95,11 +95,11 @@ class ProjectServiceTest {
 
     @Test
     void update_withNullFields_keepsExistingValues() {
-        Project existing = new Project(1L, "Website Redesign", "Redesign the company website with modern UI", "active", 1L);
+        Project existing = new Project(1L, "Website Redesign", "Redesign the company website with modern UI", "active", 1L, null);
         when(projectRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(projectRepository.save(existing)).thenReturn(existing);
 
-        ProjectResponseDto result = projectService.update(1L, new ProjectRequestDto(null, null, null, null));
+        ProjectResponseDto result = projectService.update(1L, new ProjectRequestDto(null, null, null, null, null));
 
         assertThat(result.name()).isEqualTo("Website Redesign");
         assertThat(result.description()).isEqualTo("Redesign the company website with modern UI");
@@ -110,7 +110,7 @@ class ProjectServiceTest {
     void update_whenNotFound_throwsException() {
         when(projectRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> projectService.update(99L, new ProjectRequestDto("Website Redesign", "Some description", "active", 1L)))
+        assertThatThrownBy(() -> projectService.update(99L, new ProjectRequestDto("Website Redesign", "Some description", "active", 1L, null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("99");
     }

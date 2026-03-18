@@ -37,7 +37,7 @@ public class UserService {
             throw new IllegalArgumentException("Username already taken: " + dto.username());
         }
         String role = dto.role() != null ? dto.role() : "ROLE_USER";
-        User user = new User(null, dto.username(), passwordEncoder.encode(dto.password()), role);
+        User user = new User(null, dto.username(), passwordEncoder.encode(dto.password()), role, dto.organizationId());
         return toResponse(userRepository.save(user));
     }
 

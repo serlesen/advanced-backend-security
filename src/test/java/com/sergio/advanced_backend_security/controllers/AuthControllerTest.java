@@ -6,6 +6,7 @@ import com.sergio.advanced_backend_security.dtos.LoginRequestDto;
 import com.sergio.advanced_backend_security.dtos.LoginResponseDto;
 import com.sergio.advanced_backend_security.dtos.UserRequestDto;
 import com.sergio.advanced_backend_security.dtos.UserResponseDto;
+import com.sergio.advanced_backend_security.security.CustomPermissionEvaluator;
 import com.sergio.advanced_backend_security.security.JwtUtil;
 import com.sergio.advanced_backend_security.security.UserDetailsServiceImpl;
 import com.sergio.advanced_backend_security.services.AuthService;
@@ -42,6 +43,9 @@ class AuthControllerTest {
     @MockitoBean
     private UserDetailsServiceImpl userDetailsService;
 
+    @MockitoBean
+    private CustomPermissionEvaluator customPermissionEvaluator;
+
     @Test
     void login_returnsTokenWith200() throws Exception {
         when(authService.login(any())).thenReturn(new LoginResponseDto("jwt-token"));
@@ -59,7 +63,7 @@ class AuthControllerTest {
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new UserRequestDto("alice", "pass", null))))
+                        .content(objectMapper.writeValueAsString(new UserRequestDto("alice", "pass", null, null))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("alice"))

@@ -63,7 +63,7 @@ class AuthServiceTest {
             return u;
         });
 
-        UserResponseDto result = authService.register(new UserRequestDto("alice", "pass", null));
+        UserResponseDto result = authService.register(new UserRequestDto("alice", "pass", null, null));
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.username()).isEqualTo("alice");
@@ -73,9 +73,9 @@ class AuthServiceTest {
 
     @Test
     void register_withExistingUsername_throwsException() {
-        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(new User(1L, "alice", "encoded", "ROLE_USER")));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(new User(1L, "alice", "encoded", "ROLE_USER", null)));
 
-        assertThatThrownBy(() -> authService.register(new UserRequestDto("alice", "pass", null)))
+        assertThatThrownBy(() -> authService.register(new UserRequestDto("alice", "pass", null, null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("alice");
         verify(userRepository, never()).save(any());

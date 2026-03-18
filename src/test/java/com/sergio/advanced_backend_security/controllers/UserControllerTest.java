@@ -3,6 +3,7 @@ package com.sergio.advanced_backend_security.controllers;
 import tools.jackson.databind.ObjectMapper;
 import com.sergio.advanced_backend_security.dtos.UserRequestDto;
 import com.sergio.advanced_backend_security.dtos.UserResponseDto;
+import com.sergio.advanced_backend_security.security.CustomPermissionEvaluator;
 import com.sergio.advanced_backend_security.security.JwtUtil;
 import com.sergio.advanced_backend_security.security.UserDetailsServiceImpl;
 import com.sergio.advanced_backend_security.services.UserService;
@@ -45,6 +46,9 @@ class UserControllerTest {
     @MockitoBean
     private UserDetailsServiceImpl userDetailsService;
 
+    @MockitoBean
+    private CustomPermissionEvaluator customPermissionEvaluator;
+
     @Test
     @WithMockUser
     void findAll_authenticated_returns200WithList() throws Exception {
@@ -84,7 +88,7 @@ class UserControllerTest {
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new UserRequestDto("alice", "pass", "ROLE_USER"))))
+                        .content(objectMapper.writeValueAsString(new UserRequestDto("alice", "pass", "ROLE_USER", null))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("alice"));
@@ -97,7 +101,7 @@ class UserControllerTest {
 
         mockMvc.perform(put("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new UserRequestDto("alice-updated", null, "ROLE_ADMIN"))))
+                        .content(objectMapper.writeValueAsString(new UserRequestDto("alice-updated", null, "ROLE_ADMIN", null))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("alice-updated"))
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"));

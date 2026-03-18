@@ -34,8 +34,8 @@ class UserServiceTest {
     @Test
     void findAll_returnsAllUsersAsDtos() {
         when(userRepository.findAll()).thenReturn(List.of(
-                new User(1L, "alice", "encoded", "ROLE_USER"),
-                new User(2L, "bob", "encoded", "ROLE_ADMIN")
+                new User(1L, "alice", "encoded", "ROLE_USER", null),
+                new User(2L, "bob", "encoded", "ROLE_ADMIN", null)
         ));
 
         List<UserResponseDto> result = userService.findAll();
@@ -47,7 +47,7 @@ class UserServiceTest {
 
     @Test
     void findById_whenExists_returnsDto() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(new User(1L, "alice", "encoded", "ROLE_USER")));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User(1L, "alice", "encoded", "ROLE_USER", null)));
 
         UserResponseDto result = userService.findById(1L);
 
@@ -75,7 +75,7 @@ class UserServiceTest {
             return u;
         });
 
-        UserResponseDto result = userService.create(new UserRequestDto("alice", "pass", "ROLE_USER"));
+        UserResponseDto result = userService.create(new UserRequestDto("alice", "pass", "ROLE_USER", null));
 
         assertThat(result.username()).isEqualTo("alice");
         assertThat(result.role()).isEqualTo("ROLE_USER");
@@ -93,28 +93,28 @@ class UserServiceTest {
             return u;
         });
 
-        UserResponseDto result = userService.create(new UserRequestDto("alice", "pass", null));
+        UserResponseDto result = userService.create(new UserRequestDto("alice", "pass", null, null));
 
         assertThat(result.role()).isEqualTo("ROLE_USER");
     }
 
     @Test
     void create_withTakenUsername_throwsException() {
-        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(new User(1L, "alice", "encoded", "ROLE_USER")));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(new User(1L, "alice", "encoded", "ROLE_USER", null)));
 
-        assertThatThrownBy(() -> userService.create(new UserRequestDto("alice", "pass", "ROLE_USER")))
+        assertThatThrownBy(() -> userService.create(new UserRequestDto("alice", "pass", "ROLE_USER", null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("alice");
     }
 
     @Test
     void update_whenExists_updatesFields() {
-        User existing = new User(1L, "alice", "old-encoded", "ROLE_USER");
+        User existing = new User(1L, "alice", "old-encoded", "ROLE_USER", null);
         when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(passwordEncoder.encode("newpass")).thenReturn("new-encoded");
         when(userRepository.save(existing)).thenReturn(existing);
 
-        UserResponseDto result = userService.update(1L, new UserRequestDto("alice-new", "newpass", "ROLE_ADMIN"));
+        UserResponseDto result = userService.update(1L, new UserRequestDto("alice-new", "newpass", "ROLE_ADMIN", null));
 
         assertThat(result.username()).isEqualTo("alice-new");
         assertThat(result.role()).isEqualTo("ROLE_ADMIN");
@@ -125,7 +125,7 @@ class UserServiceTest {
     void update_whenNotFound_throwsException() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.update(99L, new UserRequestDto("x", "y", "ROLE_USER")))
+        assertThatThrownBy(() -> userService.update(99L, new UserRequestDto("x", "y", "ROLE_USER", null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("99");
     }
