@@ -1,0 +1,13 @@
+package com.sergio.advanced_backend_security;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class AdvancedBackendSecurityApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
